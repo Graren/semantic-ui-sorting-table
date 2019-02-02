@@ -7,11 +7,12 @@ import options from "../data/options";
 class SearchableTable extends React.PureComponent {
   constructor(props) {
     super(props);
+    const [username] = options;
     this.state = {
       currentlyShownElements: data,
       text: "",
-      category: options[0].value,
-      sortingCategory: options[0].value,
+      category: username.value,
+      sortingCategory: username.value,
       strategy: "descending"
     };
   }
@@ -34,21 +35,18 @@ class SearchableTable extends React.PureComponent {
 
   _filterElements = data => {
     const { category, text } = this.state;
+    const [username, mail, age] = options;
     if (!text || text === "") return data;
     else {
-      if (category === options[0].value) {
-        return data.filter(user => user.username.includes(text));
-      } else if (category === options[1].value) {
-        return data.filter(user => user.email.includes(text));
-      } else if (category === options[2].value) {
-        try {
-          const numericValue = parseInt(text);
-          return data.filter(user => user.age === numericValue);
-        } catch (err) {
+      switch (category) {
+        case username.value:
+          return data.filter(user => user.username.includes(text));
+        case mail.value:
+          return data.filter(user => user.email.includes(text));
+        case age.value:
+          return data.filter(user => `${user.age}` === `${text}`);
+        default:
           return data;
-        }
-      } else {
-        return data;
       }
     }
   };
@@ -67,29 +65,27 @@ class SearchableTable extends React.PureComponent {
 
   _sort = data => {
     const { strategy, sortingCategory } = this.state;
-    if (sortingCategory === options[0].value) {
-      return strategy === "ascending"
-        ? data.sort((a, b) =>
-            a.username < b.username ? -1 : a.username > b.username ? 1 : 0
-          )
-        : data.sort(
-            (a, b) =>
-              -(a.username < b.username ? -1 : a.username > b.username ? 1 : 0)
-          );
-    } else if (sortingCategory === options[1].value) {
-      return strategy === "ascending"
-        ? data.sort((a, b) =>
-            a.email < b.email ? -1 : a.email > b.email ? 1 : 0
-          )
-        : data.sort(
-            (a, b) => -(a.email < b.email ? -1 : a.email > b.email ? 1 : 0)
-          );
-    } else if (sortingCategory === options[2].value) {
-      return strategy === "ascending"
-        ? data.sort((a, b) => (a.age < b.age ? -1 : a.age > b.age ? 1 : 0))
-        : data.sort((a, b) => -(a.age < b.age ? -1 : a.age > b.age ? 1 : 0));
-    } else {
-      return data;
+    const [username, mail, age] = options;
+    const usernameSort = (a, b) =>
+      a.username < b.username ? -1 : a.username > b.username ? 1 : 0;
+    const emailSort = (a, b) =>
+      a.email < b.email ? -1 : a.email > b.email ? 1 : 0;
+    const ageSort = (a, b) => (a.age < b.age ? -1 : a.age > b.age ? 1 : 0);
+    switch (sortingCategory) {
+      case username.value:
+        return strategy === "ascending"
+          ? data.sort(usernameSort)
+          : data.sort((a, b) => usernameSort(a, b) * -1);
+      case mail.value:
+        return strategy === "ascending"
+          ? data.sort(emailSort)
+          : data.sort((a, b) => emailSort(a, b) * -1);
+      case age.value:
+        return strategy === "ascending"
+          ? data.sort(ageSort)
+          : data.sort((a, b) => ageSort(a, b) * -1);
+      default:
+        return data;
     }
   };
 
