@@ -1,0 +1,5 @@
+[
+  { "key": "username", "text": "Username", "value": "username" },
+  { "key": "mail", "text": "Mail", "value": "mail" },
+  { "key": "age", "text": "Age", "value": "age" }
+]
